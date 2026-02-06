@@ -57,3 +57,8 @@ extern lstrlenA
 ; Accelerator Functions
 extern CreateAcceleratorTableA
 extern TranslateAcceleratorA
+
+; Drag and Drop Functions (Shell32)
+extern DragAcceptFiles
+extern DragQueryFileA
+extern DragFinish

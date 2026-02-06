@@ -9,7 +9,7 @@ extern hInstance, hEdit, hMainWnd, CurrentFile, FileBuffer
 extern EmptyStr, FileFilter, SaveTitle, OpenTitle
 extern ErrorRead, ErrorWrite, ErrorTitle
 
-global FileNew, FileOpen, FileSave, FileSaveAs, SaveToFile
+global FileNew, FileOpen, FileSave, FileSaveAs, SaveToFile, FileOpenByPath
 
 section .text
 
@@ -181,6 +181,138 @@ FileOpen:
     mov     byte [REL CurrentFile], 0
     
 .Done:
+    mov     RSP, RBP
+    pop     RBP
+    ret
+
+; ============================================================================
+; FileOpenByPath - Open file by path (for drag-drop) - CLEAN VERSION
+; ============================================================================
+FileOpenByPath:
+    push    RBP
+    mov     RBP, RSP
+    push    R12
+    push    R13
+    push    R14
+    push    RSI
+    push    RDI
+    sub     RSP, 72          ; 6 pushes = 48 bytes, need +8 for alignment = 72
+    
+    ; Save filename pointer
+    mov     R14, RCX
+    
+    ; Copy filename to CurrentFile
+    mov     RSI, R14
+    lea     RDI, [REL CurrentFile]
+    xor     ECX, ECX
+    
+.CopyLoop:
+    mov     AL, byte [RSI + RCX]
+    mov     byte [RDI + RCX], AL
+    test    AL, AL
+    jz      .CopyDone
+    inc     ECX
+    cmp     ECX, 259
+    jge     .CopyDone
+    jmp     .CopyLoop
+    
+.CopyDone:
+    mov     byte [RDI + RCX], 0
+    
+    ; Open file
+    sub     RSP, 64
+    lea     RCX, [REL CurrentFile]
+    mov     EDX, GENERIC_READ
+    xor     R8D, R8D
+    xor     R9D, R9D
+    mov     dword [RSP + 32], OPEN_EXISTING
+    mov     dword [RSP + 40], FILE_ATTRIBUTE_NORMAL
+    mov     qword [RSP + 48], 0
+    call    CreateFileA
+    add     RSP, 64
+    
+    cmp     RAX, -1
+    je      near .Error
+    
+    mov     R12, RAX
+    
+    ; Get file size
+    sub     RSP, 32
+    mov     RCX, R12
+    xor     EDX, EDX
+    call    GetFileSize
+    add     RSP, 32
+    
+    cmp     EAX, -1
+    je      near .Close
+    
+    mov     R13D, EAX
+    
+    ; Read file
+    sub     RSP, 48
+    mov     RCX, R12
+    lea     RDX, [REL FileBuffer]
+    mov     R8D, R13D
+    lea     R9, [RBP - 8]
+    mov     qword [RSP + 32], 0
+    call    ReadFile
+    add     RSP, 48
+    
+    ; Null terminate
+    lea     RAX, [REL FileBuffer]
+    add     RAX, R13
+    mov     byte [RAX], 0
+    
+    ; Set text in editor
+    sub     RSP, 32
+    mov     RCX, qword [REL hEdit]
+    mov     EDX, 0x0C
+    xor     R8D, R8D
+    lea     R9, [REL FileBuffer]
+    call    SendMessageA
+    add     RSP, 32
+    
+    ; Clear modified flag
+    sub     RSP, 32
+    mov     RCX, qword [REL hEdit]
+    mov     EDX, EM_SETMODIFY
+    xor     R8D, R8D
+    xor     R9D, R9D
+    call    SendMessageA
+    add     RSP, 32
+    
+    ; Empty undo buffer
+    sub     RSP, 32
+    mov     RCX, qword [REL hEdit]
+    mov     EDX, EM_EMPTYUNDOBUFFER
+    xor     R8D, R8D
+    xor     R9D, R9D
+    call    SendMessageA
+    add     RSP, 32
+    
+.Close:
+    sub     RSP, 32
+    mov     RCX, R12
+    call    CloseHandle
+    add     RSP, 32
+    jmp     near .FileOpenDone
+    
+.Error:
+    sub     RSP, 32
+    xor     ECX, ECX
+    lea     RDX, [REL ErrorRead]
+    lea     R8, [REL ErrorTitle]
+    mov     R9D, MB_OK | MB_ICONERROR
+    call    MessageBoxA
+    add     RSP, 32
+    
+.FileOpenDone:
+    add     RSP, 72
+    pop     RDI
+    pop     RSI
+    pop     R14
+    pop     R13
+    pop     R12
     mov     RSP, RBP
     pop     RBP
     ret

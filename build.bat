@@ -50,7 +50,7 @@ gcc -nostartfiles -mwindows ^
     build\dialogs.obj ^
     build\data.obj ^
     -o TadWin.exe ^
-    -luser32 -lkernel32 -lcomdlg32 -lgdi32 ^
+    -luser32 -lkernel32 -lcomdlg32 -lgdi32 -lshell32 ^
     -Wl,--entry=Start
 
 if %errorlevel% neq 0 goto :error

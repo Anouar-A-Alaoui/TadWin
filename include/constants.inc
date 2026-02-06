@@ -120,3 +120,9 @@ MB_ICONWARNING      EQU 30h
 MB_ICONERROR        EQU 10h
 IDYES               EQU 6
 IDNO                EQU 7
+
+; Drag and Drop Messages
+WM_DROPFILES        EQU 233h
+
+; Window Extended Styles
+WS_EX_ACCEPTFILES   EQU 10h

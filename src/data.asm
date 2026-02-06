@@ -6,15 +6,16 @@ section .data
     global WindowName, ClassName, DialogClassName
     global EditClass, ButtonClass, StaticClass
     global RichEditLib
-    global RichEditLib
+    global RichEditLib, Shell32Lib
     
-    WindowName      db "TadWin", 0
-    ClassName       db "TadWinClass", 0
-    DialogClassName db "TadWinDialog", 0
+    WindowName      db "MyNotepad", 0
+    ClassName       db "MyNotepadClass", 0
+    DialogClassName db "MyNotepadDialog", 0
     EditClass       db "RichEdit20A", 0  ; RichEdit ANSI version
     ButtonClass     db "BUTTON", 0
     StaticClass     db "STATIC", 0
     RichEditLib     db "Riched20.dll", 0
+    Shell32Lib      db "Shell32.dll", 0
     
     ; Menu Strings
     global MenuFile, MenuEdit, MenuNew, MenuOpen, MenuSave, MenuSaveAs, MenuExit
