@@ -8,6 +8,7 @@ extern MessageBoxA, SendMessageA, GetFileSize, lstrlenA
 extern hInstance, hEdit, hMainWnd, CurrentFile, FileBuffer
 extern EmptyStr, FileFilter, SaveTitle, OpenTitle
 extern ErrorRead, ErrorWrite, ErrorTitle
+extern UpdateWindowTitle
 
 global FileNew, FileOpen, FileSave, FileSaveAs, SaveToFile, FileOpenByPath
 
@@ -42,6 +43,11 @@ FileNew:
     xor     R8D, R8D
     xor     R9D, R9D
     call    SendMessageA
+    
+    ; Update window title
+    sub     RSP, 32
+    call    UpdateWindowTitle
+    add     RSP, 32
     
     mov     RSP, RBP
     pop     RBP
@@ -162,6 +168,11 @@ FileOpen:
     xor     R9D, R9D
     call    SendMessageA
     add     RSP, 48
+    
+    ; Update window title
+    sub     RSP, 32
+    call    UpdateWindowTitle
+    add     RSP, 32
     
 .Close:
     sub     RSP, 32
@@ -290,6 +301,11 @@ FileOpenByPath:
     call    SendMessageA
     add     RSP, 32
     
+    ; Update window title
+    sub     RSP, 32
+    call    UpdateWindowTitle
+    add     RSP, 32
+    
 .Close:
     sub     RSP, 32
     mov     RCX, R12
@@ -384,6 +400,11 @@ FileSaveAs:
     
     call    SaveToFile
     
+    ; Update window title with new filename
+    sub     RSP, 32
+    call    UpdateWindowTitle
+    add     RSP, 32
+    
 .Done:
     mov     RSP, RBP
     pop     RBP
@@ -459,6 +480,11 @@ SaveToFile:
     xor     R9D, R9D
     call    SendMessageA
     add     RSP, 48
+    
+    ; Update window title (remove asterisk)
+    sub     RSP, 32
+    call    UpdateWindowTitle
+    add     RSP, 32
     
     jmp     near .Done
     

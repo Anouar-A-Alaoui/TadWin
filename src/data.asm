@@ -4,18 +4,30 @@
 
 section .data
     global WindowName, ClassName, DialogClassName
-    global EditClass, ButtonClass, StaticClass
+    global EditClass, ButtonClass, StaticClass, StatusBarClass
     global RichEditLib
     global RichEditLib, Shell32Lib
     
-    WindowName      db "MyNotepad", 0
-    ClassName       db "MyNotepadClass", 0
-    DialogClassName db "MyNotepadDialog", 0
+    WindowName      db "TadWin", 0
+    ClassName       db "TadWinClass", 0
+    DialogClassName db "TadWinDialog", 0
     EditClass       db "RichEdit20A", 0  ; RichEdit ANSI version
     ButtonClass     db "BUTTON", 0
     StaticClass     db "STATIC", 0
+    StatusBarClass  db "msctls_statusbar32", 0
     RichEditLib     db "Riched20.dll", 0
     Shell32Lib      db "Shell32.dll", 0
+    
+    ; Title strings
+    global UntitledTitle, TitleSeparator, ModifiedMarker
+    UntitledTitle   db "Untitled - TadWin", 0
+    TitleSeparator  db " - TadWin", 0
+    ModifiedMarker  db "*", 0
+    
+    ; Status bar format strings
+    global StatusLineCol, StatusLines
+    StatusLineCol   db "Ln %d, Col %d", 0
+    StatusLines     db "Lines: %d", 0
     
     ; Menu Strings
     global MenuFile, MenuEdit, MenuNew, MenuOpen, MenuSave, MenuSaveAs, MenuExit
@@ -129,10 +141,11 @@ AccelCount dd 8
 
 section .bss
     alignb 8
-    global hInstance, hEdit, hMainWnd, hFindDlg, hReplaceDlg
+    global hInstance, hEdit, hMainWnd, hFindDlg, hReplaceDlg, hStatusBar
     global hFindEdit, hReplaceEdit1, hReplaceEdit2
     global CurrentFile, FileBuffer, SearchBuf, ReplaceBuf
     global hAccel
+    global TitleBuffer, StatusBuffer
     
     hInstance       resq 1
     hEdit           resq 1
@@ -143,7 +156,10 @@ section .bss
     hReplaceEdit1   resq 1
     hReplaceEdit2   resq 1
     hAccel          resq 1
+    hStatusBar      resq 1
     CurrentFile     resb 260
     FileBuffer      resb 1048576
     SearchBuf       resb 256
     ReplaceBuf      resb 256
+    TitleBuffer     resb 512
+    StatusBuffer    resb 256

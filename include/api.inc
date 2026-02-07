@@ -15,6 +15,7 @@ extern ShowWindow
 extern TranslateMessage
 extern UpdateWindow
 extern DestroyWindow
+extern SetWindowTextA
 
 ; Menu APIs
 extern CreateMenu
@@ -28,6 +29,8 @@ extern MoveWindow
 extern SetFocus
 extern EnableWindow
 extern IsWindow
+extern SetTimer
+extern KillTimer
 
 ; Message Box
 extern MessageBoxA
@@ -53,6 +56,9 @@ extern GetAsyncKeyState
 
 ; String Functions
 extern lstrlenA
+extern lstrcpyA
+extern lstrcatA
+extern wsprintfA
 
 ; Accelerator Functions
 extern CreateAcceleratorTableA
